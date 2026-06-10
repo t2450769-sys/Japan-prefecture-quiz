@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>都道府県ハカセクイズ！</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Kiwi Maru for friendly Japanese vibe) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@400;500;700&family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'M PLUS Rounded 1c', 'Kiwi Maru', sans-serif;
+            background-color: #f0fdf4; /* Light green background */
+        }
+        .bouncy {
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .jp-ruby ruby {
+            ruby-position: over;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between text-slate-800">
+
+    <!-- Header -->
+    <header class="bg-emerald-500 text-white shadow-md p-4 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold flex items-center gap-2">
+                <span>🗺️</span>
+                <span class="tracking-wider">都道府県<ruby>博士<rt>はかせ</rt></ruby>クイズ！</span>
+            </h1>
+            <div class="flex items-center gap-3">
+                <button onclick="showSealBook()" class="bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold px-3 py-1.5 rounded-full text-xs md:text-sm flex items-center gap-1 transition shadow">
+                    <span>👑</span>シール<ruby>帳<rt>ちょう</rt></ruby> <span id="header-seal-count" class="bg-white px-2 py-0.5 rounded-full text-amber-600">0/47</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl w-full mx-auto p-4 flex-grow">
+        
+        <!-- START SCREEN -->
+        <div id="screen-start" class="bg-white rounded-3xl p-6 md:p-8 shadow-xl border-4 border-emerald-300 text-center space-y-6 my-4">
+            <div class="space-y-2">
+                <p class="text-emerald-600 font-bold text-sm md:text-base">小学校4年生社会科対応！</p>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-emerald-700 leading-snug">
+                    めざせ！日本全国マスター！
+                </h2>
+                <p class="text-slate-600 text-sm md:text-base">
+                    クイズに正解して、47都道府県すべての「ごほうびシール」をあつめよう！
+                </p>
+            </div>
+
+            <!-- Character Banner -->
+            <div class="bg-emerald-50 rounded-2xl p-4 flex items-center justify-center gap-4 max-w-md mx-auto border border-emerald-100">
+                <div class="text-5xl bouncy">🦁</div>
+                <div class="text-left">
+                    <p class="font-bold text-emerald-800 text-sm">案内役：トド丸（トドまる）</p>
+                    <p class="text-xs text-slate-600 leading-relaxed">「日本のことならボクにまかせて！ヒントが必要なときはいつでも呼んでね！」</p>
+                </div>
+            </div>
+
+            <!-- Mode Selection -->
+            <div class="space-y-4">
+                <h3 class="font-bold text-lg text-slate-700 flex items-center justify-center gap-1">
+                    🎯 クイズのテーマをえらぼう！
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+                    <button onclick="selectMode('specialty')" class="group bg-rose-50 hover:bg-rose-100 border-2 border-rose-300 hover:border-rose-400 p-4 rounded-2xl transition duration-300 text-left flex items-start gap-3 shadow-sm">
+                        <span class="text-3xl p-2 bg-rose-100 group-hover:scale-110 transition rounded-xl">🍎</span>
+                        <div>
+                            <h4 class="font-bold text-rose-800 text-base">めいぶつ・日本一</h4>
+                            <p class="text-xs text-slate-600 mt-1">特産品や日本一の山・湖などから県をあてるよ！</p>
+                        </div>
+                    </button>
+                    <button onclick="selectMode('capital')" class="group bg-blue-50 hover:bg-blue-100 border-2 border-blue-300 hover:border-blue-400 p-4 rounded-2xl transition duration-300 text-left flex items-start gap-3 shadow-sm">
+                        <span class="text-3xl p-2 bg-blue-100 group-hover:scale-110 transition rounded-xl">🏢</span>
+                        <div>
+                            <h4 class="font-bold text-blue-800 text-base">けんちょう所在地</h4>
+                            <p class="text-xs text-slate-600 mt-1">県庁（役所）がある都市の名前をあてるよ！</p>
+                        </div>
+                    </button>
+                    <button onclick="selectMode('silhouette')" class="group bg-amber-50 hover:bg-amber-100 border-2 border-amber-300 hover:border-amber-400 p-4 rounded-2xl transition duration-300 text-left flex items-start gap-3 shadow-sm">
+                        <span class="text-3xl p-2 bg-amber-100 group-hover:scale-110 transition rounded-xl">🗾</span>
+                        <div>
+                            <h4 class="font-bold text-amber-800 text-base">シルエットクイズ</h4>
+                            <p class="text-xs text-slate-600 mt-1">都道府県の「かたち」からどこかあてるよ！</p>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Area Selection -->
+            <div class="space-y-3 pt-2">
+                <h3 class="font-bold text-lg text-slate-700 flex items-center justify-center gap-1">
+                    🗺️ 挑戦するちほうをえらぼう！
+                </h3>
+                <div class="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto" id="area-buttons">
+                    <!-- Javascript will render area buttons -->
+                </div>
+            </div>
+
+            <div class="pt-4">
+                <button onclick="startQuiz()" id="btn-start" class="bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xl px-12 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    クイズスタート！ 🚀
+                </button>
+            </div>
+        </div>
+
+        <!-- QUIZ SCREEN -->
+        <div id="screen-quiz" class="hidden space-y-4 my-4">
+            
+            <!-- Progress Bar -->
+            <div class="bg-white rounded-2xl p-4 shadow-md flex justify-between items-center gap-4">
+                <div class="flex-grow">
+                    <div class="flex justify-between text-xs font-bold text-slate-500 mb-1">
+                        <span>進みぐあい (<span id="quiz-current-num">1</span>/5問)</span>
+                        <span id="quiz-progress-percent">20%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-3">
+                        <div id="quiz-progress-bar" class="bg-emerald-500 h-3 rounded-full transition-all duration-500" style="width: 20%"></div>
+                    </div>
+                </div>
+                <div class="text-right whitespace-nowrap">
+                    <span class="text-xs text-slate-500 font-bold">正解数</span>
+                    <p class="text-xl font-black text-emerald-600"><span id="quiz-score">0</span> / 5</p>
+                </div>
+            </div>
+
+            <!-- Quiz Main Card -->
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-xl border-4 border-emerald-300 space-y-6">
+                <!-- Question Title -->
+                <div class="flex justify-between items-start gap-4">
+                    <div class="space-y-1">
+                        <span id="question-tag" class="bg-rose-100 text-rose-800 text-xs font-bold px-2.5 py-1 rounded-full">めいぶつ・日本一</span>
+                        <h3 class="text-lg md:text-xl font-bold text-slate-800 pt-1" id="question-title">
+                            <!-- Question Text will go here -->
+                        </h3>
+                    </div>
+                    <button onclick="toggleHint()" class="bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 transition shrink-0">
+                        <span>💡</span>ヒント
+                    </button>
+                </div>
+
+                <!-- Hint Bubble (Hidden by default) -->
+                <div id="hint-bubble" class="hidden bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
+                    <div class="text-3xl">🦁</div>
+                    <div>
+                        <p class="text-xs text-amber-800 font-bold">トド丸のヒント：</p>
+                        <p class="text-sm text-slate-700 font-medium" id="hint-text">この県は、◯◯地方にあるよ！</p>
+                    </div>
+                </div>
+
+                <!-- Silhouette / Image Box (Visible only for Silhouette mode) -->
+                <div id="silhouette-container" class="hidden flex justify-center bg-slate-50 rounded-2xl p-4 border border-slate-200">
+                    <svg id="silhouette-svg" class="w-48 h-48 text-slate-700 filter drop-shadow-md" viewBox="0 0 100 100" fill="currentColor">
+                        <!-- Custom shape will be inserted here dynamically -->
+                    </svg>
+                </div>
+
+                <!-- Options Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="options-container">
+                    <!-- Buttons generated dynamically -->
+                </div>
+            </div>
+
+            <!-- Feedback Overlay / Message (Custom Alert substitute) -->
+            <div id="feedback-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-3xl max-w-md w-full p-6 text-center shadow-2xl border-4 transform transition-all duration-300 scale-95" id="feedback-card">
+                    <div class="text-6xl mb-3" id="feedback-icon">⭕</div>
+                    <h4 class="text-2xl font-black mb-2" id="feedback-title">正解！</h4>
+                    
+                    <!-- Seal get effect -->
+                    <div id="seal-get-animation" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 flex items-center justify-center gap-3">
+                        <div class="text-3xl">🎖️</div>
+                        <div class="text-left">
+                            <p class="text-xs text-amber-800 font-bold">新しいごほうびシールをゲット！</p>
+                            <p class="text-sm font-black text-slate-700" id="seal-prefecture-name">青森県</p>
+                        </div>
+                    </div>
+
+                    <!-- Character Explanation -->
+                    <div class="bg-emerald-50 rounded-2xl p-4 text-left border border-emerald-100 flex gap-3 mb-6">
+                        <div class="text-4xl shrink-0">🦁</div>
+                        <div>
+                            <p class="text-xs text-emerald-800 font-bold">トド丸のはかせ解説：</p>
+                            <p class="text-xs md:text-sm text-slate-700 leading-relaxed mt-1" id="feedback-explanation">
+                                解説テキストがここに入ります。
+                            </p>
+                        </div>
+                    </div>
+
+                    <button onclick="nextQuestion()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black py-3 rounded-full shadow-md transition text-lg">
+                        つぎのへ進む 🚀
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULT SCREEN -->
+        <div id="screen-result" class="hidden bg-white rounded-3xl p-6 md:p-8 shadow-xl border-4 border-emerald-300 text-center space-y-6 my-4">
+            <div>
+                <span class="text-5xl">🏆</span>
+                <h2 class="text-2xl md:text-3xl font-extrabold text-emerald-700 mt-2">クイズおつかれさまでした！</h2>
+                <p class="text-slate-500 text-sm mt-1">今回のクイズの結果を発表するよ！</p>
+            </div>
+
+            <!-- Score Circle -->
+            <div class="bg-emerald-50 max-w-sm mx-auto rounded-2xl p-6 border border-emerald-100 flex flex-col items-center">
+                <span class="text-xs text-emerald-800 font-bold">あなたのせいせき</span>
+                <div class="text-5xl font-black text-emerald-600 my-2"><span id="result-score">5</span> / 5問</div>
+                <p class="text-sm text-slate-700 font-bold" id="result-message">全問正解！きみは完ぺきな都道府県マスターだ！</p>
+            </div>
+
+            <!-- New Seals List -->
+            <div id="new-seals-section" class="space-y-3 max-w-md mx-auto hidden">
+                <h3 class="font-bold text-sm text-slate-600">✨ 今回あつめたシール ✨</h3>
+                <div id="new-seals-container" class="flex flex-wrap justify-center gap-3">
+                    <!-- New seals dynamic list -->
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-center gap-3 pt-4">
+                <button onclick="showSealBook()" class="bg-amber-400 hover:bg-amber-500 text-slate-900 font-black px-6 py-3 rounded-full shadow-md transition text-sm sm:text-base flex items-center justify-center gap-1">
+                    🏅 シール帳（ちず）をみる
+                </button>
+                <button onclick="backToHome()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-black px-6 py-3 rounded-full shadow-md transition text-sm sm:text-base">
+                    もういちど遊ぶ 🔄
+                </button>
+            </div>
+        </div>
+
+        <!-- SEAL BOOK (MAP) SCREEN -->
+        <div id="screen-seal-book" class="hidden bg-white rounded-3xl p-4 md:p-8 shadow-xl border-4 border-amber-300 space-y-6 my-4">
+            <div class="flex justify-between items-center border-b pb-4">
+                <div>
+                    <h2 class="text-xl md:text-2xl font-extrabold text-amber-700 flex items-center gap-1">
+                        👑 <span>ごほうび日本ちずシール帳</span>
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">
+                        クイズに正解して全47都道府県のシールをあつめよう！
+                    </p>
+                </div>
+                <button onclick="backToHome()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-xl text-xs md:text-sm transition">
+                    ホームに戻る
+                </button>
+            </div>
+
+            <!-- Counter and Reset -->
+            <div class="flex justify-between items-center bg-amber-50 p-3 rounded-xl border border-amber-200">
+                <div class="text-xs md:text-sm font-bold text-amber-800">
+                    あつまったシール: <span id="seal-book-count" class="text-lg font-black text-amber-600">0</span> / 47
+                </div>
+                <button onclick="resetSealsConfirm()" class="text-[10px] text-rose-500 hover:underline font-bold">
+                    データをリセットする ⚠️
+                </button>
+            </div>
+
+            <!-- Map Layout (Friendly Visual Map) -->
+            <div class="bg-sky-50 rounded-2xl p-4 border border-sky-100">
+                <p class="text-center text-xs text-sky-700 font-bold mb-3">📍 ちほうの名前をクリックすると、くわしい県の一覧がみられるよ！</p>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <!-- Hokkaido/Tohoku -->
+                    <button onclick="scrollToRegion('region-hokkaido-tohoku')" class="bg-blue-100 hover:bg-blue-200 p-3 rounded-xl text-left border border-blue-200 transition">
+                        <span class="text-xs text-blue-800 font-bold">北海道・東北</span>
+                        <p class="text-[10px] text-slate-500 mt-1" id="seal-count-hokkaido-tohoku">集めた数: 0/7</p>
+                    </button>
+                    <!-- Kanto -->
+                    <button onclick="scrollToRegion('region-kanto')" class="bg-green-100 hover:bg-green-200 p-3 rounded-xl text-left border border-green-200 transition">
+                        <span class="text-xs text-green-800 font-bold">関東ちほう</span>
+                        <p class="text-[10px] text-slate-500 mt-1" id="seal-count-kanto">集めた数: 0/7</p>
+                    </button>
+                    <!-- Chubu -->
+                    <button onclick="scrollToRegion('region-chubu')" class="bg-yellow-100 hover:bg-yellow-200 p-3 rounded-xl text-left border border-yellow-200 transition">
+                        <span class="text-xs text-yellow-800 font-bold">中部ちほう</span>
+                        <p class="text-[10px] text-slate-500 mt-1" id="seal-count-chubu">集めた数: 0/9</p>
+                    </button>
+                    <!-- Kansai -->
+                    <button onclick="scrollToRegion('region-kansai')" class="bg-orange-100 hover:bg-orange-200 p-3 rounded-xl text-left border border-orange-200 transition">
+                        <span class="text-xs text-orange-800 font-bold">近畿（関西）ちほう</span>
+                        <p class="text-[10px] text-slate-500 mt-1" id="seal-count-kansai">集めた数: 0/7</p>
+                    </button>
+                    <!-- Chugoku/Shikoku -->
+                    <button onclick="scrollToRegion('region-chugoku-shikoku')" class="bg-purple-100 hover:bg-purple-200 p-3 rounded-xl text-left border border-purple-200 transition">
+                        <span class="text-xs text-purple-800 font-bold">中国・四国</span>
+                        <p class="text-[10px] text-slate-500 mt-1" id="seal-count-chugoku-shikoku">集めた数: 0/9</p>
+                    </button>
+                    <!-- Kyushu/Okinawa -->
+                    <button onclick="scrollToRegion('region-kyushu-okinawa')" class="bg-rose-100 hover:bg-rose-200 p-3 rounded-xl text-left border border-rose-200 transition">
+                        <span class="text-xs text-rose-800 font-bold">九州・沖縄</span>
+                        <p class="text-[10px] text-slate-500 mt-1" id="seal-count-kyushu-okinawa">集めた数: 0/8</p>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Seals Details Section -->
+            <div class="space-y-6 pt-4">
+                <h3 class="font-bold text-slate-700 border-l-4 border-amber-400 pl-2">📜 シールコレクション一覧</h3>
+                
+                <div id="regions-seals-list" class="space-y-6">
+                    <!-- Dynamic region sections with prefecture seal slots -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-emerald-800 text-emerald-100 p-4 text-center text-xs mt-8">
+        <div class="max-w-4xl mx-auto space-y-1">
+            <p>© 2026 都道府県博士クイズ！ - 小学校社会科べんきょうシリーズ</p>
+            <p>楽しみながら、47都道府県の名前、位置、名物をマスターしよう！</p>
+        </div>
+    </footer>
+
+    <!-- Custom Dialog Modal (Replaces Browser Confirm/Alert) -->
+    <div id="dialog-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl border-4 border-rose-300">
+            <div class="text-5xl mb-2">⚠️</div>
+            <h4 class="text-xl font-bold text-slate-800 mb-2" id="dialog-title">本当にリセットしますか？</h4>
+            <p class="text-xs text-slate-500 mb-6" id="dialog-desc">これまであつめたシールがすべて消えてしまいます。</p>
+            <div class="flex gap-3">
+                <button onclick="closeDialog()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 rounded-xl text-sm transition">
+                    やめる
+                </button>
+                <button id="dialog-confirm-btn" class="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-bold py-2 rounded-xl text-sm transition">
+                    リセットする
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Definitions -->
+    <script>
+        // 47 Prefectures Data designed for 4th Graders
+        const PREFECTURES_DATA = {
+            "hokkaido": { name: "北海道", ruby: "ほっかいどう", region: "hokkaido-tohoku", capital: "札幌", capital_ruby: "さっぽろ", specialty: "じゃがいも、メロン、広い牧場", silhouette: "M 30,20 L 70,20 L 80,40 L 70,70 L 40,80 L 20,50 Z", hint: "日本で1ばん大きな面積の都道府県だよ！", fact: "日本最大の島で、広い大地では酪農（らくのう）がさかん。じゃがいもやたまねぎの生産量も日本一です。" },
+            "aomori": { name: "青森県", ruby: "あおもりけん", region: "hokkaido-tohoku", capital: "青森", capital_ruby: "あおもり", specialty: "りんご、にんにく、ねぶた祭り", silhouette: "M 40,25 L 60,25 L 70,45 L 60,75 L 35,70 Z", hint: "りんごの生産量が日本一の県だよ！", fact: "本州の1ばん北にある県。世界自然遺産の白神山地（しらかみさんち）があり、夏のねぶた祭りがとても有名！" },
+            "iwate": { name: "岩手県", ruby: "いわてけん", region: "hokkaido-tohoku", capital: "盛岡", capital_ruby: "もりおか", specialty: "南部鉄器、わんこそば、リアス海岸", silhouette: "M 30,20 L 60,20 L 70,50 L 60,80 L 40,75 Z", hint: "北海道のつぎに広い面積をもつ県だよ！", fact: "わんこそばなどのユニークな食文化があります。三陸（さんりく）の海はギザギザした「リアス海岸」が有名です。" },
+            "miyagi": { name: "宮城県", ruby: "みやぎけん", region: "hokkaido-tohoku", capital: "仙台", capital_ruby: "せんだい", specialty: "牛タン、笹かまぼこ、七夕まつり", silhouette: "M 35,30 L 60,25 L 65,65 L 45,75 Z", hint: "東北地方で1ばん人口が多い「仙台市」がある県だよ！", fact: "仙台市は「杜の都（もりのみやこ）」とよばれ、戦国武将の伊達政宗（だてまさむね）がひらいた街です。" },
+            "akita": { name: "秋田県", ruby: "あきたけん", region: "hokkaido-tohoku", capital: "秋田", capital_ruby: "あきた", specialty: "あきたこまち（米）、きりたんぽ、秋田犬", silhouette: "M 40,20 L 55,20 L 50,65 L 35,60 Z", hint: "伝統行事の「なまはげ」で有名な県だよ！", fact: "おいしいお米「あきたこまち」がとれるお米どころ。冬の郷土料理「きりたんぽ」が人気です。" },
+            "yamagata": { name: "山形県", ruby: "やまがたけん", region: "hokkaido-tohoku", capital: "山形", capital_ruby: "やまがた", specialty: "さくらんぼ、将棋の駒（天童市）", silhouette: "M 35,25 L 50,20 L 55,60 L 40,65 Z", hint: "くだものの王様「さくらんぼ」が日本一とれる県だよ！", fact: "さくらんぼの生産量が全国の約7割をしめます。また、すべての市町村に温泉（おんせん）がわき出ています。" },
+            "fukushima": { name: "福島県", ruby: "ふくしまけん", region: "hokkaido-tohoku", capital: "福島", capital_ruby: "ふくしま", specialty: "桃、喜多方ラーメン、赤べこ", silhouette: "M 25,30 L 70,30 L 65,70 L 30,70 Z", hint: "東北地方の1ばん南にあり、3つの地域にわかれている県だよ！", fact: "会津（あいづ）・中通り・浜通りの3つのエリアで気候が大きくちがいます。「赤べこ」という赤い牛のおもちゃが有名です。" },
+            
+            "ibaraki": { name: "茨城県", ruby: "いばらきけん", region: "kanto", capital: "水戸", capital_ruby: "みと", specialty: "納豆、ほしいも、メロン", silhouette: "M 40,20 L 60,30 L 55,75 L 35,65 Z", hint: "ねばねばでおいしい「納豆（なっとう）」が有名な県だよ！", fact: "日本で2番目に大きな湖「霞ヶ浦（かすみがうら）」があります。ほしいもの生産量も日本一です。" },
+            "tochigi": { name: "栃木県", ruby: "とちぎけん", region: "kanto", capital: "宇都宮", capital_ruby: "うつのみや", specialty: "いちご（とちおとめ）、宇都宮ギョーザ、日光東照宮", silhouette: "M 35,20 L 55,25 L 55,70 L 35,65 Z", hint: "いちごの生産量が日本一で、日光の社寺がある県だよ！", fact: "徳川家康をおまつりした「日光東照宮（にっこうとうしょうぐう）」には、見ざる・言わざる・聞かざるの彫刻があります。" },
+            "gunma": { name: "群馬県", ruby: "ぐんまけん", region: "kanto", capital: "前橋", capital_ruby: "まえばし", specialty: "キャベツ、草津温泉、からっ風", silhouette: "M 30,25 L 55,20 L 60,60 L 35,70 Z", hint: "ツルの形をしていて、温泉やキャベツが有名な海なし県だよ！", fact: "上毛かるたで「つる舞う形の群馬県」とよばれます。高原キャベツの生産や、名湯「草津温泉（くさつおんせん）」が有名です。" },
+            "saitama": { name: "埼玉県", ruby: "さいたまけん", region: "kanto", capital: "さいたま", capital_ruby: "さいたま", specialty: "ネギ（深谷）、草加せんべい、鉄道博物館", silhouette: "M 25,35 L 65,30 L 60,60 L 30,65 Z", hint: "東京の北にあり、ひらがなの県庁所在地をもつ県だよ！", fact: "日本一暑い街として有名な熊谷（くまがや）市があります。ネギの生産やサツマイモづくりもさかんです。" },
+            "chiba": { name: "千葉県", ruby: "ちばけん", region: "kanto", capital: "千葉", capital_ruby: "ちば", specialty: "落花生（ピーナッツ）、テーマパーク、成田空港", silhouette: "M 40,20 L 55,20 L 65,75 L 45,85 Z", hint: "落花生（ピーナッツ）の生産がダントツ日本一の県だよ！", fact: "東京ディズニーリゾートや、日本の玄関口である成田国際空港があります。半島のかたちをしています。" },
+            "tokyo": { name: "東京都", ruby: "とうきょうと", region: "kanto", capital: "新宿", capital_ruby: "しんじゅく", specialty: "東京スカイツリー、雷門、もんじゃ焼き", silhouette: "M 20,40 L 70,35 L 75,55 L 25,55 Z", hint: "日本の首都（しゅと）で、国会議事堂があるよ！", fact: "日本で1ばん人口が多く政治や経済の中心地です。高層ビル群の一方、小笠原諸島（おがさわらしょとう）などの豊かな自然もあります。" },
+            "kanagawa": { name: "神奈川県", ruby: "かながわけん", region: "kanto", capital: "横浜", capital_ruby: "よこはま", specialty: "中華街、箱根温泉、大仏（鎌倉）", silhouette: "M 30,35 L 60,35 L 65,65 L 35,65 Z", hint: "赤レンガ倉庫や、歴史ある鎌倉（かまくら）がある県だよ！", fact: "県庁所在地の横浜市には、大きな中華街（ちゅうかがい）や港があります。箱根（はこね）の温泉地も大人気です。" },
+
+            "niigata": { name: "新潟県", ruby: "にいがたけん", region: "chubu", capital: "新潟", capital_ruby: "にいがた", specialty: "コシヒカリ（米）、錦鯉、スキー場", silhouette: "M 20,20 L 70,40 L 60,70 L 25,50 Z", hint: "日本で1ばん長い「信濃川（しなのがわ）」が流れるお米どころだよ！", fact: "ブランド米「コシヒカリ」の産地。豪雪（ごうせつ）地帯で、日本で最初のスキー場がつくられた場所でもあります。" },
+            "toyama": { name: "富山県", ruby: "とやまけん", region: "chubu", capital: "富山", capital_ruby: "とやま", specialty: "ホタルイカ、黒部ダム、くすり", silhouette: "M 30,30 L 60,30 L 60,70 L 35,70 Z", hint: "立山連峰（たてやまれんぽう）があり、薬の富山として知られるよ！", fact: "富山湾（とやまわん）でとれるホタルイカやシロエビが有名。巨大な「黒部（くろべ）ダム」もあります。" },
+            "ishikawa": { name: "石川県", ruby: "いしかわけん", region: "chubu", capital: "金沢", capital_ruby: "かなざわ", specialty: "金箔、輪島塗、兼六園", silhouette: "M 45,15 L 55,20 L 40,75 L 30,65 Z", hint: "北陸新幹線が通り、日本三大名園の「兼六園（けんろくえん）」があるよ！", fact: "能登（のと）半島があり、漆器（しっき）の輪島塗や、金沢の金箔（きんぱく）など、伝統的な工芸がさかんです。" },
+            "fukui": { name: "福井県", ruby: "ふくいけん", region: "chubu", capital: "福井", capital_ruby: "ふくい", specialty: "恐竜の化石、めがねフレーム、越前ガニ", silhouette: "M 35,30 L 65,30 L 60,65 L 30,60 Z", hint: "たくさんの「恐竜（きょうりゅう）の化石」が発見されている県だよ！", fact: "福井県立恐竜博物館が有名。また、日本で作られる「めがねのフレーム」のほぼすべてを生産しています。" },
+            "yamanashi": { name: "山梨県", ruby: "やまなしけん", region: "chubu", capital: "甲府", capital_ruby: "こうふ", specialty: "ぶどう、桃、富士山（北側）", silhouette: "M 35,30 L 60,30 L 60,65 L 35,65 Z", hint: "富士山の北半分があり、ぶどうや桃の生産が日本一の県だよ！", fact: "まわりを高い山にかこまれた盆地（ぼんち）で、くだもの作りがさかん。「ほうとう」という太い麺の料理も有名です。" },
+            "nagano": { name: "長野県", ruby: "ながのけん", region: "chubu", capital: "長野", capital_ruby: "ながの", specialty: "レタス、りんご、信州そば", silhouette: "M 35,20 L 55,20 L 65,70 L 40,80 Z", hint: "日本で1ばん多くの「隣の県（8つ）」と接している県だよ！", fact: "高い山に囲まれ「日本の屋根」とよばれます。涼しい気候をいかした、夏のレタスやキャベツづくりが有名です。" },
+            "gifu": { name: "岐阜県", ruby: "ぎふけん", region: "chubu", capital: "岐阜", capital_ruby: "ぎふ", specialty: "白川郷（合掌造り）、鵜飼い、さるぼぼ", silhouette: "M 30,25 L 60,30 L 60,75 L 35,70 Z", hint: "昔ながらの合掌造（がっしょうづくり）の家が並ぶ「白川郷」があるよ！", fact: "北部は飛騨（ひだ）山脈などの高い山、南部は木曽三川（きそさんせん）が流れる平野で、豊かな水に恵まれています。" },
+            "shizuoka": { name: "静岡県", ruby: "しずおかけん", region: "chubu", capital: "静岡", capital_ruby: "しずおか", specialty: "お茶、プラモデル、富士山（南側）", silhouette: "M 20,35 L 75,35 L 70,65 L 25,60 Z", hint: "お茶の生産量が日本一で、富士山の南半分がある県だよ！", fact: "日本一深い「駿河湾（するがわん）」があります。また、ミカンやウナギの養殖（ようしょく）でも知られています。" },
+            "aichi": { name: "愛知県", ruby: "あいちけん", region: "chubu", capital: "名古屋", capital_ruby: "なごや", specialty: "自動車、ひつまぶし、名古屋城", silhouette: "M 25,35 L 65,35 L 60,65 L 30,60 Z", hint: "自動車の生産が日本一で、金のしゃちほこの名古屋城があるよ！", fact: "日本一の工業地帯である中京工業地帯の中心。豊臣秀吉や織田信長など、有名な武将を多くうみだしました。" },
+
+            "shiga": { name: "滋賀県", ruby: "しがけん", region: "kansai", capital: "大津", capital_ruby: "おおつ", specialty: "琵琶湖、近江牛、信楽焼（たぬきの置物）", silhouette: "M 35,30 L 55,30 L 55,65 L 35,65 Z", hint: "日本で1ばん大きな湖「琵琶湖（びわこ）」がある県だよ！", fact: "県の面積の約6分の1を「琵琶湖」がしめています。おいしい近江牛（おうみぎゅう）の産地でもあります。" },
+            "kyoto": { name: "京都府", ruby: "きょうとふ", region: "kansai", capital: "京都", capital_ruby: "きょうと", specialty: "金閣寺、清水寺、八ツ橋", silhouette: "M 30,30 L 50,25 L 55,65 L 35,70 Z", hint: "1000年以上むかし、日本の都（みやこ）があった歴史の街だよ！", fact: "お寺や神社などの歴史的建造物（建造物）がたくさんあり、世界中から観光客がおとずれます。宇治茶（うじちゃ）が有名です。" },
+            "osaka": { name: "大阪府", ruby: "おおさかふ", region: "kansai", capital: "大阪", capital_ruby: "おおさか", specialty: "たこ焼き、お好み焼き、大阪城", silhouette: "M 40,40 L 55,40 L 50,65 L 35,60 Z", hint: "関西の中心地で、たこ焼きやお好み焼きが有名だよ！", fact: "昔から商業の街「天下の台所」として栄えました。世界遺産の大きな百舌鳥（もず）・古市（ふるいち）古墳群があります。" },
+            "hyogo": { name: "兵庫県", ruby: "ひょうごけん", region: "kansai", capital: "神戸", capital_ruby: "こうべ", specialty: "姫路城、明石大橋、玉ねぎ（淡路島）", silhouette: "M 30,25 L 55,20 L 50,75 L 30,70 Z", hint: "北は日本海、南は瀬戸内海（せとないかい）に接する広い県だよ！", fact: "白くて美しい「姫路城（ひめじじょう）」は日本最初の世界遺産。県庁の神戸はオシャレな港町です。" },
+            "nara": { name: "奈良県", ruby: "ならけん", region: "kansai", capital: "奈良", capital_ruby: "なら", specialty: "大仏（東大寺）、しか、吉野杉", silhouette: "M 35,30 L 55,30 L 50,75 L 35,70 Z", hint: "東大寺の大きな大仏や、たくさんのシカがいる公園が有名だよ！", fact: "京都よりも古い都「平城京（へいじょうきょう）」がありました。海がない県で、日本最古の木造建築「法隆寺」があります。" },
+            "wakayama": { name: "和歌山県", ruby: "わかやまけん", region: "kansai", capital: "和歌山", capital_ruby: "わかやま", specialty: "みかん（有田）、梅干し（紀州）、パンダ", silhouette: "M 30,35 L 60,40 L 55,75 L 35,70 Z", hint: "みかん（有田みかん）や梅干しの生産が日本一の県だよ！", fact: "紀伊（きい）半島にあり、豊かな山と海に恵まれています。高野山（こうやさん）や熊野古道などの世界遺産があります。" },
+            "tottori": { name: "鳥取県", ruby: "とっとりけん", region: "chugoku-shikoku", capital: "鳥取", capital_ruby: "とっとり", specialty: "鳥取砂丘、梨（二十世紀梨）、らっきょう", silhouette: "M 25,40 L 65,40 L 60,55 L 30,55 Z", hint: "日本一大きな砂の丘「鳥取砂丘（とっとりさきゅう）」があるよ！", fact: "日本で1ばん人口が少ない県ですが、みずみずしくておいしい「二十世紀梨（にじっせいきなし）」づくりが大変さかんです。" },
+
+            "shimane": { name: "島根県", ruby: "しまねけん", region: "chugoku-shugoku", capital: "松江", capital_ruby: "まつえ", specialty: "出雲大社、しじみ（宍道湖）、世界遺産の銀山", silhouette: "M 20,45 L 65,40 L 55,60 L 25,60 Z", hint: "神様が集まることで有名な「出雲大社（いづもたいしゃ）」があるよ！", fact: "世界遺産「石見銀山（いわみぎんざん）」があります。また、汽水湖（きすいこ）の宍道湖ではシジミがよくとれます。" },
+            "okayama": { name: "岡山県", ruby: "おかやまけん", region: "chugoku-shikoku", capital: "岡山", capital_ruby: "おかやま", specialty: "桃太郎、マスカット、ジーンズ", silhouette: "M 30,35 L 55,30 L 55,65 L 35,65 Z", hint: "昔話の「桃太郎（ももたろう）」の舞台として有名な県だよ！", fact: "雨が少なく「晴れの国」とよばれます。マスカットや白桃の栽培（さいばい）やジーンズ作りが有名です。" },
+            "hiroshima": { name: "広島県", ruby: "ひろしまけん", region: "chugoku-shikoku", capital: "広島", capital_ruby: "ひろしま", specialty: "厳島神社（鳥居）、レモン、お好み焼き", silhouette: "M 25,30 L 65,30 L 60,65 L 30,65 Z", hint: "海に立つ大きな赤い鳥居の「厳島（いつくしま）神社」があるよ！", fact: "レモンの生産量が日本一。世界平和を願う「原爆ドーム」があり、世界中から多くの人がおとずれます。" },
+            "yamaguchi": { name: "山口県", ruby: "やまぐちけん", region: "chugoku-shikoku", capital: "山口", capital_ruby: "やまぐち", specialty: "ふぐ、秋吉台（カルスト台地）、錦帯橋", silhouette: "M 20,40 L 55,35 L 50,65 L 25,60 Z", hint: "本州の1ばん西のはしにある県。高級魚「ふぐ」が有名だよ！", fact: "日本最大のカルスト台地「秋吉台（あきよしだい）」があり、白い岩がたくさん並んでいます。下関のふぐが有名です。" },
+            "tokushima": { name: "徳島県", ruby: "とくしまけん", region: "chugoku-shikoku", capital: "徳島", capital_ruby: "とくしま", specialty: "阿波おどり、すだち、鳴門の渦潮", silhouette: "M 35,40 L 60,40 L 55,65 L 30,60 Z", hint: "400年以上の歴史がある夏のダンス「阿波（あわ）おどり」が有名だよ！", fact: "本州と淡路島を経由して「大鳴門橋」でつながっています。鳴門（なると）のうずしおが有名です。" },
+            "kagawa": { name: "香川県", ruby: "かがわけん", region: "chugoku-shikoku", capital: "高松", capital_ruby: "たかまつ", specialty: "讃岐うどん、小豆島のオリーブ", silhouette: "M 35,40 L 65,40 L 60,55 L 40,55 Z", hint: "日本で1ばん面積が小さいけれど、「うどん県」とも呼ばれるよ！", fact: "「讃岐（さぬき）うどん」を求めて全国から人があつまります。小豆島（しょうどしま）でのオリーブ栽培も有名です。" },
+            "ehime": { name: "愛媛県", ruby: "えひめけん", region: "chugoku-shikoku", capital: "松山", capital_ruby: "まつやま", specialty: "みかん、道後温泉、今治タオル", silhouette: "M 25,40 L 60,35 L 55,65 L 30,70 Z", hint: "かんきつ類（みかんや伊予柑）づくりがとてもさかんで、日本最古の温泉があるよ！", fact: "3000年の歴史をもつ「道後温泉（どうごおんせん）」があります。また高級な「今治（いまばり）タオル」の産地です。" },
+            "kochi": { name: "高知県", ruby: "こうちけん", region: "chugoku-shikoku", capital: "高知", capital_ruby: "こうち", specialty: "カツオのたたき、坂本龍馬、よさこい祭り", silhouette: "M 25,40 L 65,35 L 60,65 L 30,60 Z", hint: "太平洋に大きく面していて、坂本龍馬（りょうま）の像がある県だよ！", fact: "温暖（おんだん）な気候をいかして、ビニールハウスで野菜を早く育てる「促成（そくせい）栽培」がさかんです。" },
+
+            "fukuoka": { name: "福岡県", ruby: "ふくおかけん", region: "kyushu-okinawa", capital: "福岡", capital_ruby: "ふくおか", specialty: "明太子、いちご（あまおう）、ラーメン", silhouette: "M 30,30 L 65,30 L 60,65 L 35,60 Z", hint: "九州で1ばん人口が多く、辛子明太子（めんたいこ）が有名な県だよ！", fact: "アジアの国々に近く、昔から貿易の窓口でした。あまくて美味しいいちご「あまおう」がつくられています。" },
+            "saga": { name: "佐賀県", ruby: "さがけん", region: "kyushu-okinawa", capital: "佐賀", capital_ruby: "さが", specialty: "有田焼、吉野ヶ里遺跡、のり", silhouette: "M 35,35 L 55,35 L 55,60 L 35,60 Z", hint: "弥生時代の大きな村「吉野ヶ里（よしのがり）遺跡」がある県だよ！", fact: "有明海（ありあけかい）の干満（かんまん）の差を利用した「のり」の養殖や、伝統ある「有田焼（ありたやき）」が有名です。" },
+            "nagasaki": { name: "長崎県", ruby: "ながさきけん", region: "kyushu-okinawa", capital: "長崎", capital_ruby: "ながさき", specialty: "カステラ、ちゃんぽん、ハウステンボス", silhouette: "M 25,30 L 50,30 L 45,70 L 20,60 Z", hint: "たくさんの島があり、むかし外国（オランダなど）に開かれていた港町だよ！", fact: "島や半島の数がとても多い県。ポルトガルからつたわったカステラや、鎖国（さこく）時代に出島（でじま）があったことで有名です。" },
+            "kumamoto": { name: "熊本県", ruby: "くまもとけん", region: "kyushu-okinawa", capital: "熊本", capital_ruby: "くまもと", specialty: "阿蘇山、スイカ、熊本城", silhouette: "M 35,30 L 55,30 L 50,75 L 30,70 Z", hint: "世界最大級のカルデラをもつ「阿蘇山（あそさん）」がある県だよ！", fact: "阿蘇山の豊かな湧き水に恵まれています。すいかの生産量が日本一で、立派な石垣がある熊本城も有名です。" },
+            "oita": { name: "大分県", ruby: "おおいたけん", region: "kyushu-okinawa", capital: "大分", capital_ruby: "おおいた", specialty: "別府温泉、湯布院、かぼす", silhouette: "M 30,30 L 60,30 L 60,65 L 35,65 Z", hint: "温泉（おんせん）のわき出る量や源泉の数が日本一の「おんせん県」だよ！", fact: "別府（べっぷ）や由布院（ゆふいん）といった大人気温泉地があります。かぼすの生産も日本一です。" },
+            "miyazaki": { name: "宮崎県", ruby: "みやざきけん", region: "kyushu-okinawa", capital: "宮崎", capital_ruby: "みやざき", specialty: "マンゴー、ピーマン、チキン南蛮", silhouette: "M 35,30 L 55,30 L 50,75 L 30,70 Z", hint: "一年中あたたかく、ヤシの木が並ぶ南国気分の県だよ！", fact: "あたたかい気候を利用して、冬でもピーマンやきゅうりを育てるのがさかん。甘い「完熟マンゴー」が人気です。" },
+            "kagoshima": { name: "鹿児島県", ruby: "かごしまけん", region: "kyushu-okinawa", capital: "鹿児島", capital_ruby: "かごしま", specialty: "桜島（火山）、さつまいも、黒豚", silhouette: "M 30,35 L 60,35 L 55,80 L 30,75 Z", hint: "今もモクモク煙をあげる火山「桜島（さくらじま）」が有名な県だよ！", fact: "サツマイモや、お肉（豚や鶏など）の生産がトップクラス。南には宇宙ロケットの射場がある種子島（たねがしま）があります。" },
+            "okinawa": { name: "沖縄県", ruby: "おきなわけん", region: "kyushu-okinawa", capital: "那覇", capital_ruby: "なは", specialty: "シーサー、さとうきび、美しいサンゴの海", silhouette: "M 20,40 L 70,30 L 65,70 L 25,65 Z", hint: "日本の一番南西にあり、美しいサンゴの海に囲まれた島々だよ！", fact: "1年中あたたかく、独特の「琉球（りゅうきゅう）文化」がのこる島。ゴーヤーやさとうきびの栽培が有名です。" }
+        };
+
+        const REGIONS = {
+            "all": { name: "全こく", color: "bg-emerald-500 hover:bg-emerald-600 text-white" },
+            "hokkaido-tohoku": { name: "北海道・東北", color: "bg-blue-100 hover:bg-blue-200 text-blue-800" },
+            "kanto": { name: "関東", color: "bg-green-100 hover:bg-green-200 text-green-800" },
+            "chubu": { name: "中部", color: "bg-yellow-100 hover:bg-yellow-200 text-yellow-800" },
+            "kansai": { name: "近畿(かんさい)", color: "bg-orange-100 hover:bg-orange-200 text-orange-800" },
+            "chugoku-shikoku": { name: "中国・四国", color: "bg-purple-100 hover:bg-purple-200 text-purple-800" },
+            "kyushu-okinawa": { name: "九州・沖縄", color: "bg-rose-100 hover:bg-rose-200 text-rose-800" }
+        };
+    </script>
+
+    <!-- Quiz Logic & Interface Scripts -->
+    <script>
+        // State variables
+        let selectedMode = 'specialty'; // specialty, capital, silhouette
+        let selectedRegion = 'all';
+        let currentQuestionIndex = 0;
+        let quizQuestions = [];
+        let score = 0;
+        let earnedSealsThisRound = [];
+        let hintUsed = false;
+
+        // Load Seals from localStorage (In-memory fallback handled by saving to storage if allowed)
+        let collectedSeals = {};
+        try {
+            const saved = localStorage.getItem('prefecture_quiz_seals_v1');
+            if (saved) {
+                collectedSeals = JSON.parse(saved);
+            }
+        } catch(e) {
+            console.log("Localstorage not accessible, using memory");
+        }
+
+        // Initialize App on DOM Ready
+        window.addEventListener('DOMContentLoaded', () => {
+            renderAreaButtons();
+            renderSealBookSections();
+            updateSealCounters();
+            
+            // Default selected mode highlight
+            selectMode('specialty');
+        });
+
+        // 1. Render UI components
+        function renderAreaButtons() {
+            const container = document.getElementById('area-buttons');
+            container.innerHTML = '';
+            
+            Object.keys(REGIONS).forEach(key => {
+                const reg = REGIONS[key];
+                const btn = document.createElement('button');
+                btn.id = `area-btn-${key}`;
+                btn.className = `px-4 py-2 rounded-full text-xs md:text-sm font-bold border transition ${reg.color}`;
+                btn.onclick = () => selectRegion(key);
+                btn.innerText = reg.name;
+                container.appendChild(btn);
+            });
+            selectRegion('all');
+        }
+
+        function renderSealBookSections() {
+            const container = document.getElementById('regions-seals-list');
+            container.innerHTML = '';
+
+            // Group prefectures by region
+            const grouped = {};
+            Object.keys(REGIONS).forEach(r => {
+                if(r !== 'all') grouped[r] = [];
+            });
+
+            Object.keys(PREFECTURES_DATA).forEach(id => {
+                const pref = PREFECTURES_DATA[id];
+                // normalize custom matching for region
+                let rId = pref.region;
+                if(rId === 'chugoku-shugoku') rId = 'chugoku-shikoku'; // correction
+                if(grouped[rId]) {
+                    grouped[rId].push({ id, ...pref });
+                }
+            });
+
+            // Draw regions
+            Object.keys(grouped).forEach(rId => {
+                const regionName = REGIONS[rId].name;
+                const section = document.createElement('div');
+                section.id = `region-${rId}`;
+                section.className = "bg-slate-50 p-4 rounded-2xl border border-slate-200 scroll-mt-20";
+                
+                let html = `
+                    <h4 class="font-bold text-slate-700 text-sm mb-3 flex items-center justify-between">
+                        <span>📍 ${regionName}ちほう</span>
+                        <span class="text-xs text-slate-500" id="reg-count-detail-${rId}">0/0</span>
+                    </h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                `;
+
+                grouped[rId].forEach(p => {
+                    const isEarned = collectedSeals[p.id];
+                    html += `
+                        <div id="seal-slot-${p.id}" class="relative flex flex-col items-center p-3 rounded-xl border-2 transition-all duration-300 ${isEarned ? 'bg-amber-100/70 border-amber-400 shadow-sm' : 'bg-slate-100 border-slate-200 opacity-60'}">
+                            <!-- Seal Badge -->
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center text-xl shadow-inner transition-transform duration-500 ${isEarned ? 'bg-amber-300 rotate-12 scale-110' : 'bg-slate-200'}">
+                                ${isEarned ? '💮' : '❔'}
+                            </div>
+                            <span class="text-xs font-bold text-slate-800 mt-2">${p.name}</span>
+                            <span class="text-[9px] text-slate-500">${p.capital}市</span>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                section.innerHTML = html;
+                container.appendChild(section);
+            });
+        }
+
+        // 2. State & selection helpers
+        function selectMode(mode) {
+            selectedMode = mode;
+            // Visual Update for Mode Cards
+            const modes = ['specialty', 'capital', 'silhouette'];
+            modes.forEach(m => {
+                // simple styles
+            });
+        }
+
+        function selectRegion(regionKey) {
+            selectedRegion = regionKey;
+            // Visual highlight
+            Object.keys(REGIONS).forEach(key => {
+                const btn = document.getElementById(`area-btn-${key}`);
+                if (btn) {
+                    if (key === regionKey) {
+                        btn.classList.add('ring-4', 'ring-emerald-300', 'border-emerald-500');
+                    } else {
+                        btn.classList.remove('ring-4', 'ring-emerald-300', 'border-emerald-500');
+                    }
+                }
+            });
+        }
+
+        // 3. Quiz Game Flow
+        function startQuiz() {
+            // Filter prefectures based on selected region
+            let availablePrefs = Object.keys(PREFECTURES_DATA);
+            if (selectedRegion !== 'all') {
+                availablePrefs = availablePrefs.filter(key => {
+                    let r = PREFECTURES_DATA[key].region;
+                    if(r === 'chugoku-shugoku') r = 'chugoku-shikoku';
+                    return r === selectedRegion;
+                });
+            }
+
+            // Shuffle and pick 5 questions (or total count if less than 5)
+            const shuffled = [...availablePrefs].sort(() => 0.5 - Math.random());
+            const questionKeys = shuffled.slice(0, Math.min(5, shuffled.length));
+
+            if(questionKeys.length === 0) {
+                alert("クイズが見つかりませんでした。別の地方をえらんでね！");
+                return;
+            }
+
+            // Generate Questions
+            quizQuestions = questionKeys.map(key => {
+                const correctPref = PREFECTURES_DATA[key];
+                
+                // Get 3 incorrect options from the same pool or nationwide
+                let wrongPool = Object.keys(PREFECTURES_DATA).filter(k => k !== key);
+                // Try to get wrong options from same region first to make it educational
+                let regionalWrong = wrongPool.filter(k => PREFECTURES_DATA[k].region === correctPref.region);
+                let selectedWrongKeys = [];
+                
+                if (regionalWrong.length >= 3) {
+                    selectedWrongKeys = regionalWrong.sort(() => 0.5 - Math.random()).slice(0, 3);
+                } else {
+                    selectedWrongKeys = wrongPool.sort(() => 0.5 - Math.random()).slice(0, 3);
+                }
+
+                const options = [key, ...selectedWrongKeys].map(k => ({
+                    key: k,
+                    name: PREFECTURES_DATA[k].name,
+                    ruby: PREFECTURES_DATA[k].ruby
+                })).sort(() => 0.5 - Math.random()); // Shuffle options
+
+                return {
+                    correctKey: key,
+                    correctData: correctPref,
+                    options: options
+                };
+            });
+
+            // Reset scores & navigation
+            currentQuestionIndex = 0;
+            score = 0;
+            earnedSealsThisRound = [];
+            
+            showScreen('screen-quiz');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            hintUsed = false;
+            document.getElementById('hint-bubble').classList.add('hidden');
+            
+            const q = quizQuestions[currentQuestionIndex];
+            
+            // Progress Bar & Count
+            document.getElementById('quiz-current-num').innerText = currentQuestionIndex + 1;
+            const progressPercent = ((currentQuestionIndex + 1) / quizQuestions.length) * 100;
+            document.getElementById('quiz-progress-bar').style.width = `${progressPercent}%`;
+            document.getElementById('quiz-progress-percent').innerText = `${Math.round(progressPercent)}%`;
+            document.getElementById('quiz-score').innerText = score;
+
+            // Question tag and title
+            const tag = document.getElementById('question-tag');
+            const title = document.getElementById('question-title');
+            const silContainer = document.getElementById('silhouette-container');
+
+            silContainer.classList.add('hidden');
+
+            if (selectedMode === 'specialty') {
+                tag.innerText = "🍎 めいぶつ・日本一クイズ";
+                tag.className = "bg-rose-100 text-rose-800 text-xs font-bold px-2.5 py-1 rounded-full";
+                title.innerHTML = `「<span class="text-rose-600">${q.correctData.specialty}</span>」が有名な都道府県はどこかな？`;
+            } else if (selectedMode === 'capital') {
+                tag.innerText = "🏢 けんちょう所在地クイズ";
+                tag.className = "bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-1 rounded-full";
+                title.innerHTML = `県庁（けんちょう）所在地が「<span class="text-blue-600">${q.correctData.capital}市</span>」の都道府県はどこかな？`;
+            } else {
+                tag.innerText = "🗾 シルエットクイズ";
+                tag.className = "bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full";
+                title.innerHTML = `この「シルエット（かたち）」の都道府県はどこかな？`;
+                
+                // Inject Silhouette SVG
+                silContainer.classList.remove('hidden');
+                const svg = document.getElementById('silhouette-svg');
+                svg.innerHTML = `<path d="${q.correctData.silhouette}" fill="currentColor" />`;
+            }
+
+            // Set Hint Text
+            document.getElementById('hint-text').innerText = q.correctData.hint;
+
+            // Render Options Buttons
+            const optContainer = document.getElementById('options-container');
+            optContainer.innerHTML = '';
+
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "bg-white hover:bg-emerald-50 active:bg-emerald-100 border-2 border-slate-200 hover:border-emerald-400 p-4 rounded-2xl font-bold transition duration-200 text-left flex items-center justify-between text-slate-800 text-base md:text-lg shadow-sm";
+                btn.onclick = () => checkAnswer(opt.key);
+                btn.innerHTML = `
+                    <ruby class="jp-ruby">${opt.name}<rt class="text-[10px] text-slate-400">${opt.ruby}</rt></ruby>
+                    <span class="text-emerald-500 opacity-0 group-hover:opacity-100">👉</span>
+                `;
+                optContainer.appendChild(btn);
+            });
+        }
+
+        function toggleHint() {
+            const bubble = document.getElementById('hint-bubble');
+            bubble.classList.toggle('hidden');
+            hintUsed = true;
+        }
+
+        // 4. Checking & Feedback
+        function checkAnswer(selectedKey) {
+            const q = quizQuestions[currentQuestionIndex];
+            const isCorrect = selectedKey === q.correctKey;
+            
+            const modal = document.getElementById('feedback-modal');
+            const card = document.getElementById('feedback-card');
+            const icon = document.getElementById('feedback-icon');
+            const title = document.getElementById('feedback-title');
+            const exp = document.getElementById('feedback-explanation');
+            const sealPromo = document.getElementById('seal-get-animation');
+
+            // Setup custom modal theme
+            if (isCorrect) {
+                score++;
+                icon.innerText = "⭕";
+                title.innerText = "せいかい！すごい！";
+                title.className = "text-2xl font-black text-emerald-600 mb-2";
+                card.className = "bg-white rounded-3xl max-w-md w-full p-6 text-center shadow-2xl border-4 border-emerald-400 transform scale-100 transition-all duration-300";
+                
+                // Add seal reward logic
+                const alreadyHas = collectedSeals[q.correctKey];
+                collectedSeals[q.correctKey] = true;
+                
+                // Save progress
+                try {
+                    localStorage.setItem('prefecture_quiz_seals_v1', JSON.stringify(collectedSeals));
+                } catch(e) {}
+                
+                // Display seal gain alert if not acquired before
+                if (!alreadyHas) {
+                    earnedSealsThisRound.push(q.correctKey);
+                    document.getElementById('seal-prefecture-name').innerHTML = `<ruby>${q.correctData.name}<rt class="text-[10px] font-normal">${q.correctData.ruby}</rt></ruby>`;
+                    sealPromo.classList.remove('hidden');
+                } else {
+                    sealPromo.classList.add('hidden');
+                }
+            } else {
+                icon.innerText = "❌";
+                title.innerText = "ざんねん！ちがうよ";
+                title.className = "text-2xl font-black text-rose-500 mb-2";
+                card.className = "bg-white rounded-3xl max-w-md w-full p-6 text-center shadow-2xl border-4 border-rose-400 transform scale-100 transition-all duration-300";
+                sealPromo.classList.add('hidden');
+            }
+
+            // Set Explanation (Todoromaru)
+            exp.innerHTML = `<strong>${q.correctData.name}</strong>のけんちょう所在地は<strong>${q.correctData.capital}市</strong>だよ。<br>${q.correctData.fact}`;
+
+            // Sync Header Counters
+            updateSealCounters();
+
+            // Open Modal
+            modal.classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            // Close Modal
+            document.getElementById('feedback-modal').classList.add('hidden');
+            
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizQuestions.length) {
+                loadQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        // 5. Result Presentation
+        function showResult() {
+            showScreen('screen-result');
+            
+            document.getElementById('result-score').innerText = score;
+            
+            const msg = document.getElementById('result-message');
+            if (score === 5) {
+                msg.innerText = "すごい！満点（まんてん）だよ！きみは立派な都道府県ハカセだね！🥇";
+            } else if (score >= 3) {
+                msg.innerText = "お見事！よくがんばったね！もっとたくさんのシールをあつめよう！✨";
+            } else {
+                msg.innerText = "どんまい！くり返しチャレンジして、都道府県をどんどん覚えよう！📖";
+            }
+
+            // Display earned seals
+            const container = document.getElementById('new-seals-container');
+            const section = document.getElementById('new-seals-section');
+            container.innerHTML = '';
+
+            if (earnedSealsThisRound.length > 0) {
+                section.classList.remove('hidden');
+                earnedSealsThisRound.forEach(key => {
+                    const data = PREFECTURES_DATA[key];
+                    const div = document.createElement('div');
+                    div.className = "bg-amber-100 border border-amber-300 rounded-full px-4 py-1 text-xs font-bold text-amber-800 flex items-center gap-1 shadow-sm";
+                    div.innerHTML = `💮 ${data.name}`;
+                    container.appendChild(div);
+                });
+            } else {
+                section.classList.add('hidden');
+            }
+
+            // Refresh seals detail view
+            renderSealBookSections();
+        }
+
+        // 6. Seal Book & Map Functions
+        function updateSealCounters() {
+            const keys = Object.keys(PREFECTURES_DATA);
+            let totalEarned = 0;
+            
+            // Region code count helpers
+            const counts = {
+                "hokkaido-tohoku": { earned: 0, total: 0 },
+                "kanto": { earned: 0, total: 0 },
+                "chubu": { earned: 0, total: 0 },
+                "kansai": { earned: 0, total: 0 },
+                "chugoku-shikoku": { earned: 0, total: 0 },
+                "kyushu-okinawa": { earned: 0, total: 0 }
+            };
+
+            keys.forEach(key => {
+                const pref = PREFECTURES_DATA[key];
+                let r = pref.region;
+                if(r === 'chugoku-shugoku') r = 'chugoku-shikoku'; // safe guard
+
+                if (counts[r]) {
+                    counts[r].total++;
+                    if (collectedSeals[key]) {
+                        counts[r].earned++;
+                        totalEarned++;
+                    }
+                }
+            });
+
+            // Update UI
+            document.getElementById('header-seal-count').innerText = `${totalEarned}/47`;
+            document.getElementById('seal-book-count').innerText = totalEarned;
+
+            // Region panel badges
+            Object.keys(counts).forEach(rId => {
+                const badge = document.getElementById(`seal-count-${rId}`);
+                if (badge) {
+                    badge.innerText = `あつめた数: ${counts[rId].earned} / ${counts[rId].total}`;
+                }
+                const detailBadge = document.getElementById(`reg-count-detail-${rId}`);
+                if (detailBadge) {
+                    detailBadge.innerText = `あつめた数: ${counts[rId].earned} / ${counts[rId].total}`;
+                }
+            });
+        }
+
+        function scrollToRegion(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // 7. Navigation Helpers
+        function showScreen(screenId) {
+            const screens = ['screen-start', 'screen-quiz', 'screen-result', 'screen-seal-book'];
+            screens.forEach(id => {
+                const el = document.getElementById(id);
+                if (id === screenId) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'instant' });
+        }
+
+        function showSealBook() {
+            renderSealBookSections();
+            updateSealCounters();
+            showScreen('screen-seal-book');
+        }
+
+        function backToHome() {
+            showScreen('screen-start');
+        }
+
+        // 8. Custom Dialog Handlers (replaces confirm)
+        let confirmAction = null;
+        function showCustomDialog(title, desc, onConfirm) {
+            document.getElementById('dialog-title').innerText = title;
+            document.getElementById('dialog-desc').innerText = desc;
+            confirmAction = onConfirm;
+            document.getElementById('dialog-modal').classList.remove('hidden');
+        }
+
+        function closeDialog() {
+            document.getElementById('dialog-modal').classList.add('hidden');
+            confirmAction = null;
+        }
+
+        document.getElementById('dialog-confirm-btn').onclick = () => {
+            if (confirmAction) {
+                confirmAction();
+            }
+            closeDialog();
+        };
+
+        function resetSealsConfirm() {
+            showCustomDialog(
+                "本当にリセットしますか？",
+                "これまであつめた、すべての都道府県シールがきえてしまいます。",
+                () => {
+                    collectedSeals = {};
+                    try {
+                        localStorage.removeItem('prefecture_quiz_seals_v1');
+                    } catch(e) {}
+                    updateSealCounters();
+                    renderSealBookSections();
+                }
+            );
+        }
+    </script>
+</body>
+</html>
